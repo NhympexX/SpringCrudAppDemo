@@ -1,54 +1,51 @@
 package com.example.demo.user;
 
 import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.util.Date;
+
 
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@EntityListeners(AuditingEntityListener.class)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id
-//    @SequenceGenerator(
-//            name = "user_sequence",
-//            sequenceName = "user_sequence",
-//            allocationSize = 1,
-//            initialValue = 1
-//    )
-//    @GeneratedValue(
-//            strategy = GenerationType.SEQUENCE,
-//            generator = "user_sequence"
-//    )
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Integer id;
-    public String name;
-    public String username;
-    public String password;
-    public String email;
+    @SequenceGenerator(
+            name = "user_sequence",
+            sequenceName = "user_sequence",
+            allocationSize = 1,
+            initialValue = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_sequence"
+    )
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
+    String name;
+    String username;
+    String password;
+    String email;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_date", nullable = false, updatable = false)
+    @CreatedDate
+    Date createdDate;
 
-    public User() {
-    }
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "modified_date")
+    @LastModifiedDate
+    Date modifiedDate;
 
-    public User(String name, String username, String password, String email) {
-        this.name = name;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }
 
-    public User(Integer id, String name, String username, String password, String email) {
-        this.id = id;
-        this.name = name;
-        this.username = username;
-        this.password = password;
-        this.email = email;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                '}';
-    }
 }

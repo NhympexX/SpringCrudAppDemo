@@ -1,5 +1,6 @@
 package com.example.demo.user;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,14 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping(path = "api/user")
 public class UserController {
-    private final UserService service;
 
-    @Autowired
-    public UserController(UserService service) {
-        this.service = service;
-    }
+    private final UserService service;
 
     @GetMapping
     public List<User> getUsers(){
@@ -29,26 +27,26 @@ public class UserController {
     }
     @PutMapping("{id}")
     public ResponseEntity<HttpStatus> updateUser(@PathVariable("id") Integer id, @RequestBody User user){
-        Optional<User> _user = service.getUserById(id);
-        if(_user.isPresent()){
-            User foundUser = _user.get();
-            foundUser.name = user.name;
-            foundUser.email = user.email;
-            foundUser.password = user.password;
-            foundUser.username = user.username;
-            service.createUser(foundUser);
-           return new ResponseEntity<>(HttpStatus.OK);
+
+        if(service.updateUser(user,id)){
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     @DeleteMapping("{id}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Integer id){
-        Optional<User> _user = service.getUserById(id);
-        if(_user.isPresent()){
-            service.deleteUserById(id);
+        if(service.deleteUserById(id)){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<User> Login(@RequestBody LoginDto loginDto){
+        if(service.findByUidAndPsw(loginDto.getUsername(),loginDto.getPassword()).isPresent()){
+            return new ResponseEntity<>(service.findByUidAndPsw(loginDto.getUsername(),loginDto.getPassword()).get(),HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }
